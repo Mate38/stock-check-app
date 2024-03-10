@@ -1,48 +1,55 @@
-// src/screens/LoginScreen.tsx
 import React, { useState } from 'react';
 import { Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import {
-  Container,
-  Title,
-  Input,
-  ButtonContainer,
-  ButtonText
-} from '../styles/LoginStyles'; // Ajuste o caminho conforme necessário
+import { authenticate } from '../services/AuthService';
+import { Container, Input, ButtonContainer, ButtonText, Title } from '../styles/LoginStyles';
 
 const LoginScreen = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState<string>('testeapp@compufour.com.br');
+  const [password, setPassword] = useState<string>('testeApp@123');
   const navigation = useNavigation();
 
-  const handleLogin = () => {
-    // Implemente a lógica de login
-    Alert.alert('Login', 'Login efetuado com sucesso!');
-    navigation.navigate('Home');
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Erro', 'E-mail e senha são obrigatórios.');
+      return;
+    }
+
+    try {
+      const isAuthenticated = await authenticate(email, password);
+      if (!isAuthenticated) {
+        throw new Error('Falha na autenticação, verifique suas credenciais');
+      }
+      navigation.navigate('Home');
+    } catch (error: any) {
+      console.error('Erro de login:', error.message);
+      Alert.alert('Erro de login', error.message);
+    }
   };
 
   return (
     <Container>
       <Title>Login</Title>
       <Input
-        placeholder="Username"
-        value={username}
-        onChangeText={setUsername}
-        autoCapitalize="none"
+        placeholder="E-mail"
+        value={email}
+        onChangeText={setEmail}
         keyboardType="email-address"
+        autoCapitalize="none"
       />
       <Input
-        placeholder="Password"
+        placeholder="Senha"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
         autoCapitalize="none"
       />
       <ButtonContainer onPress={handleLogin}>
-        <ButtonText>Login</ButtonText>
+        <ButtonText>Entrar</ButtonText>
       </ButtonContainer>
     </Container>
   );
 };
 
 export default LoginScreen;
+
