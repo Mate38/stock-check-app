@@ -5,13 +5,32 @@ import { authenticate } from '../services/AuthService';
 import { Container, Input, ButtonContainer, ButtonText, Title } from '../styles/LoginStyles';
 
 const LoginScreen = () => {
-  const [email, setEmail] = useState<string>('testeapp@compufour.com.br');
-  const [password, setPassword] = useState<string>('testeApp@123');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const navigation = useNavigation();
+
+  const validateEmail = (email: string) => {
+    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePassword = (password: string) => {
+    return password.length >= 8;
+  };
 
   const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert('Erro', 'E-mail e senha são obrigatórios.');
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      Alert.alert('Erro', 'Insira um e-mail válido.');
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      Alert.alert('Erro', 'A senha deve ter no mínimo 8 caracteres.');
       return;
     }
 
@@ -22,7 +41,6 @@ const LoginScreen = () => {
       }
       navigation.navigate('Home');
     } catch (error: any) {
-      console.error('Erro de login:', error.message);
       Alert.alert('Erro de login', error.message);
     }
   };
@@ -31,6 +49,7 @@ const LoginScreen = () => {
     <Container>
       <Title>Login</Title>
       <Input
+        testID="email-input"
         placeholder="E-mail"
         value={email}
         onChangeText={setEmail}
@@ -38,6 +57,7 @@ const LoginScreen = () => {
         autoCapitalize="none"
       />
       <Input
+        testID="password-input"
         placeholder="Senha"
         value={password}
         onChangeText={setPassword}
@@ -45,11 +65,10 @@ const LoginScreen = () => {
         autoCapitalize="none"
       />
       <ButtonContainer onPress={handleLogin}>
-        <ButtonText>Entrar</ButtonText>
+        <ButtonText testID="login-button">Entrar</ButtonText>
       </ButtonContainer>
     </Container>
   );
 };
 
 export default LoginScreen;
-
