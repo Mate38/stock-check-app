@@ -39,7 +39,7 @@ const LoginScreen = () => {
       if (!isAuthenticated) {
         throw new Error('Falha na autenticação, verifique suas credenciais');
       }
-      navigation.navigate('Home');
+      navigation.navigate('HomeDrawer');
     } catch (error: any) {
       Alert.alert('Erro de login', error.message);
     }
