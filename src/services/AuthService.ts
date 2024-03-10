@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { storeToken } from '../utils/storage'; 
+import { storeToken } from '../utils/storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const API_URL = 'https://app.homolog.clippfacil.com.br/rpc/v2/application.authenticate';
 
@@ -41,4 +42,9 @@ export const authenticate = async (login: string, password: string) => {
     // throw error;
     throw new Error('Falha na autenticação, verifique suas credenciais');
   }
+};
+
+export const logoutUser = async (navigation: any) => {
+  await AsyncStorage.clear();
+  navigation.navigate('Login');
 };

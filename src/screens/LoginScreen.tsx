@@ -5,9 +5,11 @@ import { authenticate } from '../services/AuthService';
 import { Container, Input, ButtonContainer, ButtonText, Title } from '../styles/LoginStyles';
 
 const LoginScreen = () => {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const navigation = useNavigation();
+  const [email, setEmail] = useState<string>('testeapp@compufour.com.br');
+  const [password, setPassword] = useState<string>('testeApp@123');
+  // const [email, setEmail] = useState<string>('');
+  // const [password, setPassword] = useState<string>('');
+  const navigation: any = useNavigation();
 
   const validateEmail = (email: string) => {
     const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
