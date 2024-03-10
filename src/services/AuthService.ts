@@ -13,17 +13,9 @@ export const authenticate = async (login: string, password: string) => {
     }, {
       headers: {
         'accept': 'application/json',
-        'accept-language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
         'content-type': 'application/json',
         'origin': 'https://homolog.zetaweb.com.br',
-        'referer': 'https://homolog.zetaweb.com.br/',
-        'sec-ch-ua': '"Not A(Brand";v="99", "Google Chrome";v="121", "Chromium";v="121"',
-        'sec-ch-ua-mobile': '?1',
-        'sec-ch-ua-platform': '"Android"',
-        'sec-fetch-dest': 'empty',
-        'sec-fetch-mode': 'cors',
-        'sec-fetch-site': 'cross-site',
-        'user-agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Mobile Safari/537.36'
+        'referer': 'https://homolog.zetaweb.com.br/'
       }
     });
 
