@@ -33,8 +33,8 @@ const ProfileScreen = () => {
 
     return (
         <Container>
-            <Title>{profile?.name}</Title>
             <UserInfoSection>
+                <UserInfo>Nome: {profile?.name}</UserInfo>
                 <UserInfo>Email: {profile?.email}</UserInfo>
             </UserInfoSection>
         </Container>
