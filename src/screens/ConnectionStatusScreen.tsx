@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Title, StatusIndicator } from '../styles/ConnectionStatusStyles';
+import { Container, StatusIndicator } from '../styles/ConnectionStatusStyles';
 import { checkConnection } from '../services/ConnectionService';
 
 const ConnectionStatusScreen = () => {

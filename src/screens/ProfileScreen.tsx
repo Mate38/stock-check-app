@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { ProfileService } from '../services/ProfileService';
-import { Container, Title, UserInfo, UserInfoSection } from '../styles/ProfileStyles';
+import { Container, Title, Info, InfoSection } from '../styles/DataShowStyles';
+import { IProfileData } from '../types/ProfileTypes'; 
 
 const ProfileScreen = () => {
-    const [profile, setProfile] = useState<{ name: string; email: string } | null>(null);
+    const [profile, setProfile] = useState<IProfileData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -33,10 +34,10 @@ const ProfileScreen = () => {
 
     return (
         <Container>
-            <UserInfoSection>
-                <UserInfo>Nome: {profile?.name}</UserInfo>
-                <UserInfo>Email: {profile?.email}</UserInfo>
-            </UserInfoSection>
+            <InfoSection>
+                <Info>Nome: {profile?.name}</Info>
+                <Info>Email: {profile?.email}</Info>
+            </InfoSection>
         </Container>
     );
 };

@@ -11,13 +11,13 @@ export const Title = styled(SharedTitle)`
   color: #007bff;
 `;
 
-export const UserInfo = styled.Text`
+export const Info = styled.Text`
   font-size: 16px;
   color: #333;
   margin-bottom: 10px;
 `;
 
-export const UserInfoSection = styled.View`
+export const InfoSection = styled.View`
   background-color: #fff;
   padding: 15px;
   border-radius: 8px;
