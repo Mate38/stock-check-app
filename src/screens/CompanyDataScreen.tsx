@@ -12,8 +12,8 @@ const CompanyDataScreen = () => {
   useEffect(() => {
     const loadCompanyData = async () => {
       try {
-        const userProfile = await CompanyService.fetchCompanyData();
-        setCompanyData(userProfile);
+        const data = await CompanyService.fetchCompanyData();
+        setCompanyData(data);
       } catch (error) {
         setError('Erro ao carregar os dados da empresa');
       } finally {

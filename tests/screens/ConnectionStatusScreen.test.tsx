@@ -1,16 +1,13 @@
-// Importar as dependências necessárias para o teste
 import React from 'react';
 import { render } from '@testing-library/react-native';
 import NetInfo from '@react-native-community/netinfo';
 import ConnectionStatusScreen from '../../src/screens/ConnectionStatusScreen';
 
-// Criar o mock para addEventListener
 jest.mock('@react-native-community/netinfo', () => ({
     addEventListener: jest.fn()
 }));
 
 describe('ConnectionStatusScreen', () => {
-    // Limpar mocks antes de cada teste
     beforeEach(() => {
         jest.clearAllMocks();
     });
