@@ -1,45 +1,56 @@
 import React, { useEffect, useState } from 'react';
+import { ActivityIndicator } from 'react-native';
 import { ProfileService } from '../services/ProfileService';
-import { Container, Title, Info, InfoSection } from '../styles/DataShowStyles';
-import { IProfileData } from '../types/ProfileTypes'; 
+import { IProfileData } from '../types/ProfileTypes';
+import { Container, InfoSection, TitleInfo, ContentInfo, LoadingContainer, ErrorContainer, ErrorText } from '../styles/DataShowStyles';
 
 const ProfileScreen = () => {
-    const [profile, setProfile] = useState<IProfileData | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+  const [profile, setProfile] = useState<IProfileData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        const loadProfile = async () => {
-            try {
-                const userProfile = await ProfileService.fetchUserProfile();
-                setProfile(userProfile);
-            } catch (error) {
-                console.error(error);
-                setError('Erro ao carregar o perfil');
-            } finally {
-                setLoading(false);
-            }
-        };
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const userProfile = await ProfileService.fetchUserProfile();
+        setProfile(userProfile);
+      } catch (error) {
+        console.error(error);
+        setError('Erro ao carregar o perfil');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-        loadProfile();
-    }, []);
+    loadProfile();
+  }, []);
 
-    if (loading) {
-        return <Container><Title>Carregando...</Title></Container>;
-    }
-
-    if (error) {
-        return <Container><Title>{error}</Title></Container>;
-    }
-
+  if (loading) {
     return (
-        <Container>
-            <InfoSection>
-                <Info>Nome: {profile?.name}</Info>
-                <Info>Email: {profile?.email}</Info>
-            </InfoSection>
-        </Container>
+      <LoadingContainer>
+        <ActivityIndicator size="large" color="#007bff" />
+      </LoadingContainer>
     );
+  }
+
+  if (error) {
+    return (
+      <ErrorContainer>
+        <ErrorText>{error}</ErrorText>
+      </ErrorContainer>
+    );
+  }
+
+  return (
+    <Container>
+      <InfoSection>
+        <TitleInfo>Nome:</TitleInfo>
+        <ContentInfo>{profile?.name}</ContentInfo>
+        <TitleInfo>Email:</TitleInfo>
+        <ContentInfo>{profile?.email}</ContentInfo>
+      </InfoSection>
+    </Container>
+  );
 };
 
 export default ProfileScreen;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, StatusIndicator } from '../styles/ConnectionStatusStyles';
+import { Container, StatusIndicator, InfoSection } from '../styles/ConnectionStatusStyles';
 import { checkConnection } from '../services/ConnectionService';
 
 const ConnectionStatusScreen = () => {
@@ -16,9 +16,11 @@ const ConnectionStatusScreen = () => {
 
   return (
     <Container>
-      <StatusIndicator online={isOnline}>
-        {isOnline ? 'Conectado' : 'Desconectado'}
-      </StatusIndicator>
+      <InfoSection>
+        <StatusIndicator online={isOnline}>
+          {isOnline ? 'Conectado' : 'Desconectado'}
+        </StatusIndicator>
+      </InfoSection>
     </Container>
   );
 };

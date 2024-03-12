@@ -14,7 +14,7 @@ const DrawerNavigator = () => {
     <Drawer.Navigator drawerContent={props => <CustomDrawerContent {...props} />}>
       <Drawer.Screen name="Home" component={HomeScreen} />
       <Drawer.Screen name="Perfil do Usuário" component={ProfileScreen} />
-      <Drawer.Screen name="Dados da empresa" component={CompanyDataScreen} />
+      <Drawer.Screen name="Dados da Empresa" component={CompanyDataScreen} />
       <Drawer.Screen name="Status de Conexão" component={ConnectionStatusScreen} />
     </Drawer.Navigator>
   );
