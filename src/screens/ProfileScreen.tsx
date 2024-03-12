@@ -15,7 +15,6 @@ const ProfileScreen = () => {
         const userProfile = await ProfileService.fetchUserProfile();
         setProfile(userProfile);
       } catch (error) {
-        console.error(error);
         setError('Erro ao carregar o perfil');
       } finally {
         setLoading(false);
@@ -28,7 +27,7 @@ const ProfileScreen = () => {
   if (loading) {
     return (
       <LoadingContainer>
-        <ActivityIndicator size="large" color="#007bff" />
+        <ActivityIndicator testID="loading-indicator" size="large" color="#007bff" />
       </LoadingContainer>
     );
   }
@@ -36,7 +35,7 @@ const ProfileScreen = () => {
   if (error) {
     return (
       <ErrorContainer>
-        <ErrorText>{error}</ErrorText>
+        <ErrorText testID="error-text">{error}</ErrorText>
       </ErrorContainer>
     );
   }

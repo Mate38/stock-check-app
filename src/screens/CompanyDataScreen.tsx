@@ -15,7 +15,6 @@ const CompanyDataScreen = () => {
         const userProfile = await CompanyService.fetchCompanyData();
         setCompanyData(userProfile);
       } catch (error) {
-        console.error(error);
         setError('Erro ao carregar os dados da empresa');
       } finally {
         setLoading(false);
@@ -43,7 +42,7 @@ const CompanyDataScreen = () => {
   if (loading) {
     return (
       <LoadingContainer>
-        <ActivityIndicator size="large" color="#007bff" />
+        <ActivityIndicator testID="loading-indicator" size="large" color="#007bff" />
       </LoadingContainer>
     );
   }
@@ -51,7 +50,7 @@ const CompanyDataScreen = () => {
   if (error) {
     return (
       <ErrorContainer>
-        <ErrorText>{error}</ErrorText>
+        <ErrorText testID="error-text">{error}</ErrorText>
       </ErrorContainer>
     );
   }
