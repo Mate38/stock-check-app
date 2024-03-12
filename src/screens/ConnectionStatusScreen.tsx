@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Container, StatusIndicator, InfoSection } from '../styles/ConnectionStatusStyles';
-import { checkConnection } from '../services/ConnectionService';
+import NetInfo from '@react-native-community/netinfo';
 
 const ConnectionStatusScreen = () => {
   const [isOnline, setIsOnline] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const verifyConnection = async () => {
-      const onlineStatus = await checkConnection();
-      setIsOnline(onlineStatus);
-    };
+    const subscription = NetInfo.addEventListener(state => {
+      setIsOnline(state.isConnected && state.isInternetReachable);
+    });
 
-    verifyConnection();
+    return () => subscription();
   }, []);
 
   return (
