@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ActivityIndicator } from 'react-native';
 import { ProfileService } from '../services/ProfileService';
 import { IProfileData } from '../types/ProfileTypes';
 import { Container, InfoSection, TitleInfo, ContentInfo, LoadingContainer, ErrorContainer, ErrorText } from '../styles/DataShowStyles';
 import { checkConnection } from '../services/ConnectionService';
+import { useFocusEffect } from '@react-navigation/native';
 
 const ProfileScreen = () => {
   const [profile, setProfile] = useState<IProfileData | null>(null);
@@ -28,9 +29,11 @@ const ProfileScreen = () => {
     }
   };
 
-  useEffect(() => {
-    loadProfileData();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      loadProfileData();
+    }, [])
+  );
 
   if (loading) {
     return (

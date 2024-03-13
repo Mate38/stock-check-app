@@ -1,17 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Container, StatusIndicator, InfoSection } from '../styles/ConnectionStatusStyles';
 import NetInfo from '@react-native-community/netinfo';
+import { useFocusEffect } from '@react-navigation/native';
 
 const ConnectionStatusScreen = () => {
   const [isOnline, setIsOnline] = useState<boolean | null>(null);
 
-  useEffect(() => {
-    const subscription: any = NetInfo.addEventListener(state => {
-      setIsOnline(state.isConnected && state.isInternetReachable);
-    });
+  useFocusEffect(
+    React.useCallback(() => {
+      const subscription: any = NetInfo.addEventListener(state => {
+        setIsOnline(state.isConnected && state.isInternetReachable);
+      });
 
-    return () => subscription.remove();
-  }, []);
+      // return () => subscription.remove();
+    }, [])
+  );
 
   return (
     <Container>

@@ -1,28 +1,39 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ActivityIndicator } from 'react-native';
 import { CompanyService } from '../services/CompanyService';
 import { ICompanyData } from '../types/CompanyDataTypes';
 import { Container, InfoSection, TitleInfo, ContentInfo, LoadingContainer, ErrorContainer, ErrorText } from '../styles/DataShowStyles';
+import { checkConnection } from '../services/ConnectionService';
+import { useFocusEffect } from '@react-navigation/native';
 
 const CompanyDataScreen = () => {
   const [companyData, setCompanyData] = useState<ICompanyData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadCompanyData = async () => {
-      try {
-        const data = await CompanyService.fetchCompanyData();
-        setCompanyData(data);
-      } catch (error) {
-        setError('Erro ao carregar os dados da empresa');
-      } finally {
-        setLoading(false);
+  const loadCompanyData = async () => {
+    setLoading(true);
+    try {
+      const isOnline = await checkConnection();
+      let data;
+      if (isOnline) {
+        data = await CompanyService.fetchCompanyData();
+      } else {
+        data = await CompanyService.getCompanyData();
       }
-    };
+      setCompanyData(data);
+    } catch (error) {
+      setError('Erro ao carregar os dados da empresa');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    loadCompanyData();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      loadCompanyData();
+    }, [])
+  );
 
   const formatCNPJ = (cnpj: string): string => {
     const numericCNPJ = cnpj.replace(/\D/g, '');

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useLayoutEffect } from 'react';
+import React, { useState, useLayoutEffect } from 'react';
 import { FlatList, ActivityIndicator, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { LoadingContainer, ErrorContainer, ErrorText } from '../styles/DataShowStyles';
@@ -8,6 +8,7 @@ import { AntDesign } from '@expo/vector-icons';
 import { useProducts } from '../contexts/ProductContext';
 import { checkConnection } from '../services/ConnectionService';
 import { ProductService } from '../services/ProductService';
+import { useFocusEffect } from '@react-navigation/native';
 
 const ProductListScreen = () => {
   const { products, fetchProducts, updateProducts } = useProducts();
@@ -54,9 +55,11 @@ const ProductListScreen = () => {
     }
   };
 
-  useEffect(() => {
-    loadProducts();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      loadProducts();
+    }, [])
+  );
 
   useLayoutEffect(() => {
     navigation.setOptions({
