@@ -1,29 +1,70 @@
-import React, { useEffect, useState } from 'react';
-import { FlatList, ActivityIndicator } from 'react-native';
-import { ProductService } from '../services/ProductService';
-import { IProduct } from '../types/ProductTypes';
+import React, { useEffect, useState, useLayoutEffect } from 'react';
+import { FlatList, ActivityIndicator, Modal } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { LoadingContainer, ErrorContainer, ErrorText } from '../styles/DataShowStyles';
-import { ProductItemContainer, ProductRow, ProductDescription, ProductDetails, ProductPrice, ProductDetailLabel, ProductDetailGroup } from '../styles/ProductStyles';
+import { ProductItemContainer, ProductRow, ProductDescription, ProductDetails, ProductPrice, ProductDetailLabel, ProductDetailGroup, ScreenContainer, ButtonsRow } from '../styles/ProductStyles';
+import FilterProductListScreen from './FilterProductListScreen';
+import { AntDesign } from '@expo/vector-icons';
+import { useProducts } from '../contexts/ProductContext';
 
 const ProductListScreen = () => {
-  const [products, setProducts] = useState<IProduct[]>([]);
+  const { products, fetchProducts, updateProducts } = useProducts();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
+  const navigation = useNavigation();
+
+  const loadProducts = async () => {
+    setLoading(true);
+    try {
+      await fetchProducts();
+    } catch (error) {
+      setError('Erro ao buscar os produtos');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filterProducts = (description: string, barCode: string) => {
+    setLoading(true);
+    try {
+      const filteredProducts = products.filter(product => {
+        const matchDescription = description ? product.description.includes(description) : true;
+        const matchBarCode = barCode ? product.barCode.includes(barCode) : true;
+        return matchDescription && matchBarCode;
+      });
+      updateProducts(filteredProducts);
+    } catch (error) {
+      setError('Erro ao filtrar os produtos');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const fetchedProducts = await ProductService.getProducts();
-        setProducts(fetchedProducts);
-      } catch (error) {
-        setError('Erro ao buscar os produtos');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
+    loadProducts();
   }, []);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <ButtonsRow>
+          <AntDesign 
+            name="reload1" 
+            size={26} 
+            onPress={loadProducts} 
+            style={{ marginRight: 20 }}
+          />
+          <AntDesign
+            name="filter"
+            size={26}
+            onPress={() => setIsFilterModalVisible(true)}
+            style={{ marginRight: 15 }}
+          />
+        </ButtonsRow>
+      ),
+    });
+  }, [navigation]);
 
   if (loading) {
     return (
@@ -42,34 +83,44 @@ const ProductListScreen = () => {
   }
 
   return (
-    <FlatList
-      data={products}
-      keyExtractor={item => item.uuid}
-      renderItem={({ item }) => (
-        <ProductItemContainer>
-          <ProductRow>
-            <ProductDescription>{item.description}</ProductDescription>
-            <ProductPrice>R$ {item.price.toFixed(2)}</ProductPrice>
-          </ProductRow>
-          <ProductRow>
-            <ProductDetailGroup>
-              <ProductDetailLabel>Cód.:</ProductDetailLabel>
-              <ProductDetails>{item.sequence}</ProductDetails>
-            </ProductDetailGroup>
-            <ProductDetailGroup>
-              <ProductDetailLabel>Qtd.:</ProductDetailLabel>
-              <ProductDetails>{item.quantity}</ProductDetails>
-            </ProductDetailGroup>
-          </ProductRow>
-          <ProductRow>
-            <ProductDetailGroup>
-              <ProductDetailLabel>Cód. barras:</ProductDetailLabel>
-              <ProductDetails>{item.barCode}</ProductDetails>
-            </ProductDetailGroup>
-          </ProductRow>
-        </ProductItemContainer>
-      )}
-    />
+    <ScreenContainer>
+      <FlatList
+        data={products}
+        keyExtractor={item => item.uuid}
+        renderItem={({ item }) => (
+          <ProductItemContainer>
+            <ProductRow>
+              <ProductDescription>{item.description}</ProductDescription>
+              <ProductPrice>R$ {item.price.toFixed(2)}</ProductPrice>
+            </ProductRow>
+            <ProductRow>
+              <ProductDetailGroup>
+                <ProductDetailLabel>Cód.:</ProductDetailLabel>
+                <ProductDetails>{item.sequence}</ProductDetails>
+              </ProductDetailGroup>
+              <ProductDetailGroup>
+                <ProductDetailLabel>Qtd.:</ProductDetailLabel>
+                <ProductDetails>{item.quantity}</ProductDetails>
+              </ProductDetailGroup>
+            </ProductRow>
+            <ProductRow>
+              <ProductDetailGroup>
+                <ProductDetailLabel>Cód. barras:</ProductDetailLabel>
+                <ProductDetails>{item.barCode}</ProductDetails>
+              </ProductDetailGroup>
+            </ProductRow>
+          </ProductItemContainer>
+        )}
+      />
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={isFilterModalVisible}
+        onRequestClose={() => setIsFilterModalVisible(false)}
+      >
+        <FilterProductListScreen onClose={() => setIsFilterModalVisible(false)} filterProducts={filterProducts} />
+      </Modal>
+    </ScreenContainer>
   );
 };
 

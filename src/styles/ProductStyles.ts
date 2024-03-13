@@ -48,3 +48,13 @@ export const ProductDetailLabel = styled.Text`
   color: #333;
   font-size: 13px;
 `;
+
+export const ScreenContainer = styled.View`
+  flex: 1;
+`;
+
+export const ButtonsRow = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`;

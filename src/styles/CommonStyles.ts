@@ -22,13 +22,14 @@ export const Input = styled.TextInput`
   font-size: 16px;
 `;
 
-export const ButtonContainer = styled.TouchableOpacity`
-  width: 80%;
-  background-color: #007bff;
+export const ButtonContainer = styled.TouchableOpacity<{ bgColor?: string }>`
+  width: 100%;
+  background-color: ${(props: any) => props.bgColor || '#007bff'};
   padding: 15px;
   border-radius: 5px;
   align-items: center;
   justify-content: center;
+  margin-bottom: 10px;
 `;
 
 export const ButtonText = styled.Text`
@@ -36,3 +37,11 @@ export const ButtonText = styled.Text`
   font-size: 16px;
   font-weight: bold;
 `;
+
+export const Label = styled.Text`
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 5px;
+  font-weight: 600;
+`;
+
