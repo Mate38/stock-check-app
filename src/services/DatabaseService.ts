@@ -43,15 +43,22 @@ const storeJson = (id: string, json: object): Promise<void> => {
     });
 };
 
-const getJson = (id: string): Promise<object | null> => {
+const getJson = <T>(id: string): Promise<T | null> => {
     return new Promise((resolve, reject) => {
         db.transaction(tx => {
             tx.executeSql(
                 "SELECT json FROM json_store WHERE id = ?;",
                 [id],
-                (_, { rows }) => {
-                    if (rows.length > 0) {
-                        resolve(JSON.parse(rows.item(0).json));
+                (_, result) => {
+                    if (result.rows.length > 0) {
+                        const item = result.rows.item(0).json;
+                        try {
+                            const data = JSON.parse(item) as T;
+                            resolve(data);
+                        } catch (e) {
+                            console.error('Error parsing JSON', e);
+                            reject(e);
+                        }
                     } else {
                         resolve(null);
                     }
@@ -59,7 +66,7 @@ const getJson = (id: string): Promise<object | null> => {
                 (_, error) => {
                     console.error('Error retrieving JSON', error);
                     reject(error);
-                    return true;
+                    return false;
                 }
             );
         });

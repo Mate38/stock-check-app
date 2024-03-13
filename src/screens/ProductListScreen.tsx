@@ -6,6 +6,8 @@ import { ProductItemContainer, ProductRow, ProductDescription, ProductDetails, P
 import FilterProductListScreen from './FilterProductListScreen';
 import { AntDesign } from '@expo/vector-icons';
 import { useProducts } from '../contexts/ProductContext';
+import { checkConnection } from '../services/ConnectionService';
+import { ProductService } from '../services/ProductService';
 
 const ProductListScreen = () => {
   const { products, fetchProducts, updateProducts } = useProducts();
@@ -16,13 +18,24 @@ const ProductListScreen = () => {
 
   const loadProducts = async () => {
     setLoading(true);
-    try {
-      await fetchProducts();
-    } catch (error) {
-      setError('Erro ao buscar os produtos');
-    } finally {
-      setLoading(false);
+    const isOnline = await checkConnection();
+    if (isOnline) {
+        try {
+            await fetchProducts();
+        } catch (error) {
+            setError('Erro ao buscar os produtos');
+        }
+    } else {
+        try {
+            const localProducts = await ProductService.getLocalProducts();
+            if (localProducts) {
+              updateProducts(localProducts);
+            }
+        } catch (error) {
+            setError('Erro ao buscar os produtos localmente');
+        }
     }
+    setLoading(false);
   };
 
   const filterProducts = (description: string, barCode: string) => {
