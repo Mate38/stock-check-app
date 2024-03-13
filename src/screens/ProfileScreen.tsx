@@ -3,25 +3,33 @@ import { ActivityIndicator } from 'react-native';
 import { ProfileService } from '../services/ProfileService';
 import { IProfileData } from '../types/ProfileTypes';
 import { Container, InfoSection, TitleInfo, ContentInfo, LoadingContainer, ErrorContainer, ErrorText } from '../styles/DataShowStyles';
+import { checkConnection } from '../services/ConnectionService';
 
 const ProfileScreen = () => {
   const [profile, setProfile] = useState<IProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        const userProfile = await ProfileService.fetchUserProfile();
-        setProfile(userProfile);
-      } catch (error) {
-        setError('Erro ao carregar o perfil');
-      } finally {
-        setLoading(false);
+  const loadProfileData = async () => {
+    setLoading(true);
+    try {
+      const isOnline = await checkConnection();
+      let profileData;
+      if (isOnline) {
+        profileData = await ProfileService.fetchUserProfile();
+      } else {
+        profileData = await ProfileService.getProfile();
       }
-    };
+      setProfile(profileData);
+    } catch (error) {
+      setError('Erro ao carregar os dados do perfil');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    loadProfile();
+  useEffect(() => {
+    loadProfileData();
   }, []);
 
   if (loading) {
