@@ -36,6 +36,3 @@ export const logoutUser = async (navigation: any) => {
   await DatabaseService.removeJson('userAuth');
   navigation.navigate('Login');
 };
-
-
-
