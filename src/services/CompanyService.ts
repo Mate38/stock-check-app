@@ -1,27 +1,29 @@
 import apiClient from '../api/apiClient';
-import { ICompanyData } from '../types/CompanyDataTypes';
+
+import { ICompany } from '../types/CompanyTypes';
 import { DatabaseService } from './DatabaseService';
+
 
 const ENDPOINT = '/rpc/v1/application.get-client';
 
-const COMPANY_JSON_ID = 'companyData';
+const COMPANY_JSON_ID = 'company';
 
-const fetchCompanyData = async (): Promise<ICompanyData> => {
-    const response = await apiClient.post<ICompanyData>(ENDPOINT);
-    await storeCompanyData(response.data);
+const fetchCompany = async (): Promise<ICompany> => {
+    const response = await apiClient.post<ICompany>(ENDPOINT);
+    await storeLocalCompany(response.data);
     return response.data;
 };
 
-const storeCompanyData = async (companyData: ICompanyData): Promise<void> => {
-    await DatabaseService.storeJson(COMPANY_JSON_ID, companyData);
+const storeLocalCompany = async (company: ICompany): Promise<void> => {
+    await DatabaseService.storeJson(COMPANY_JSON_ID, company);
 };
 
-const getCompanyData = async (): Promise<ICompanyData | null> => {
-    return DatabaseService.getJson<ICompanyData>(COMPANY_JSON_ID);
+const getLocalCompany = async (): Promise<ICompany | null> => {
+    return DatabaseService.getJson<ICompany>(COMPANY_JSON_ID);
 };
 
 export const CompanyService = {
-    fetchCompanyData,
-    getCompanyData,
-    storeCompanyData
+    fetchCompany,
+    getLocalCompany,
+    storeLocalCompany
 };

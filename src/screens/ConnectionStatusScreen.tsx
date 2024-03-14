@@ -1,26 +1,22 @@
-import React, { useState } from 'react';
-import { Container, StatusIndicator, InfoSection } from '../styles/ConnectionStatusStyles';
-import NetInfo from '@react-native-community/netinfo';
-import { useFocusEffect } from '@react-navigation/native';
+import React from 'react';
+
+import { 
+  Container, 
+  StatusIndicator, 
+  InfoSection 
+} from '../styles/ConnectionStatusStyles';
+
+import { useConnection } from '../contexts/ConnectionContext';
+
 
 const ConnectionStatusScreen = () => {
-  const [isOnline, setIsOnline] = useState<boolean | null>(null);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      const unsubscribe : any = NetInfo.addEventListener(state => {
-        setIsOnline(state.isConnected && state.isInternetReachable);
-      });
-
-      return () => unsubscribe();
-    }, [])
-  );
+  const { isConnected } = useConnection();
 
   return (
     <Container>
       <InfoSection>
-        <StatusIndicator online={isOnline} testID={isOnline ? 'status-connected' : 'status-disconnected'}>
-          {isOnline ? 'Conectado' : 'Desconectado'}
+        <StatusIndicator online={isConnected} testID={isConnected ? 'status-connected' : 'status-disconnected'}>
+          {isConnected ? 'Conectado' : 'Desconectado'}
         </StatusIndicator>
       </InfoSection>
     </Container>

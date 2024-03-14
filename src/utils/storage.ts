@@ -4,7 +4,7 @@ export const storeToken = async (token: string) => {
   try {
     await AsyncStorage.setItem('userToken', token);
   } catch (error) {
-    // console.error('Error saving token', error);
+    return null;
   }
 };
 
@@ -13,7 +13,6 @@ export const getToken = async () => {
     const token = await AsyncStorage.getItem('userToken');
     return token;
   } catch (error) {
-    // console.error('Error fetching token', error);
     return null;
   }
 };

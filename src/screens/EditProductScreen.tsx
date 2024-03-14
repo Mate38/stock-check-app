@@ -1,12 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { Alert, ActivityIndicator } from 'react-native';
+
+import { 
+  Alert, 
+  ActivityIndicator 
+} from 'react-native';
+
+import { 
+  ButtonContainer, 
+  ButtonText 
+} from '../styles/CommonStyles';
+import { 
+  LoadingContainer 
+} from '../styles/DataShowStyles';
+import { 
+  ModalContainer, 
+  FormContainer, 
+  StyledInput, 
+  Title, 
+  Label, 
+  Text 
+} from '../styles/EditProductStyles';
+
 import { IProduct } from '../types/ProductTypes';
-import { ButtonContainer, ButtonText } from '../styles/CommonStyles';
-import { LoadingContainer } from '../styles/DataShowStyles';
-import { ModalContainer, FormContainer, StyledInput, Title, Label, Text } from '../styles/EditProductStyles';
-import { ProductService } from '../services/ProductService';
-import { checkConnection } from '../services/ConnectionService';
+
 import { useProducts } from '../contexts/ProductContext';
+import { ProductService } from '../services/ProductService';
+import { useConnection } from '../contexts/ConnectionContext';
+
 
 interface EditProductScreenProps {
   product: IProduct;
@@ -18,43 +38,42 @@ const EditProductScreen: React.FC<EditProductScreenProps> = ({ product, onClose 
   const [price, setPrice] = useState(product.price.toString());
   const [quantity, setQuantity] = useState(product.quantity.toString());
   const [loading, setLoading] = useState(true);
+
   const { updateProduct, setHasLocalUpdate } = useProducts();
-
-
+  const { isConnected } = useConnection();
+  
   useEffect(() => {
-    const loadProductData = async () => {
-      setLoading(true);
-      const isOnline = await checkConnection();
-      if (isOnline) {
-        try {
-          const updatedProduct = await ProductService.getProductById(product.id);
-          if (updatedProduct.id !== product.id) {
-            throw new Error();
-          };
-          setCurrentProduct(updatedProduct);
-          setPrice(updatedProduct.price.toString());
-          setQuantity(updatedProduct.quantity.toString());
-        } catch (error) {
-          Alert.alert(
-            'Erro',
-            'Não foi possível carregar os dados atualizados do produto.',
-            [
-              {
-                text: 'OK',
-                onPress: () => onClose()
-              }
-            ]);
-        }
-      }
-      setLoading(false);
-    };
-
     loadProductData();
-  }, [product.id]);
+  }, []);
+
+  const loadProductData = async () => {
+    setLoading(true);
+    if (isConnected) {
+      try {
+        const updatedProduct = await ProductService.getProductById(product.id);
+        if (updatedProduct.id !== product.id) {
+          throw new Error();
+        };
+        setCurrentProduct(updatedProduct);
+        setPrice(updatedProduct.price.toString());
+        setQuantity(updatedProduct.quantity.toString());
+      } catch (error) {
+        Alert.alert(
+          'Erro',
+          'Não foi possível carregar os dados atualizados do produto.',
+          [
+            {
+              text: 'OK',
+              onPress: () => onClose()
+            }
+          ]);
+      }
+    }
+    setLoading(false);
+  };
 
   const handleSave = async () => {
-    const isOnline = await checkConnection();
-    if (isOnline) {
+    if (isConnected) {
       try {
         const updatedProduct = { ...currentProduct, price: parseFloat(price), quantity: parseFloat(quantity) };
         await ProductService.updateProduct(updatedProduct);

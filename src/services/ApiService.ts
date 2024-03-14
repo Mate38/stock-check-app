@@ -1,9 +1,13 @@
 import { Alert } from 'react-native';
+
 import apiClient from '../api/apiClient';
+
 import { getToken } from '../utils/storage';
 import { logoutUser } from './AuthService';
 
+
 export const configureApiClient = (navigation: any) => {
+
   apiClient.interceptors.request.use(async (config) => {
     const token = await getToken();
     if (token) {
@@ -34,4 +38,5 @@ export const configureApiClient = (navigation: any) => {
     }
     return Promise.reject(error);
   });
+  
 };

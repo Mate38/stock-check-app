@@ -1,34 +1,79 @@
 import React, { useState, useLayoutEffect } from 'react';
-import { FlatList, ActivityIndicator, Modal, TouchableOpacity, View, Text, Button } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { LoadingContainer, ErrorContainer, ErrorText } from '../styles/DataShowStyles';
-import { ProductItemContainer, ProductRow, ProductDescription, ProductDetails, ProductPrice, ProductDetailLabel, ProductDetailGroup, ScreenContainer, ButtonsRow } from '../styles/ProductStyles';
-import FilterProductListScreen from './FilterProductListScreen';
-import { AntDesign } from '@expo/vector-icons';
-import { useProducts } from '../contexts/ProductContext';
-import { checkConnection } from '../services/ConnectionService';
-import { ProductService } from '../services/ProductService';
-import { useFocusEffect } from '@react-navigation/native';
-import EditProductScreen from './EditProductScreen';
-import { IProduct } from '../types/ProductTypes';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { Camera } from 'expo-camera';
+import { AntDesign } from '@expo/vector-icons';
+
+import { 
+  FlatList, 
+  ActivityIndicator, 
+  Modal, 
+  TouchableOpacity, 
+  View, 
+  Text, 
+  Button 
+} from 'react-native';
+
+import { 
+  LoadingContainer, 
+  ErrorContainer, 
+  ErrorText 
+} from '../styles/DataShowStyles';
+import { 
+  ProductItemContainer, 
+  ProductRow, 
+  ProductDescription, 
+  ProductDetails, 
+  ProductPrice, 
+  ProductDetailLabel,
+  ProductDetailGroup, 
+  ScreenContainer, 
+  ButtonsRow 
+} from '../styles/ProductStyles';
+
+import { IProduct } from '../types/ProductTypes';
+
+import { useProducts } from '../contexts/ProductContext';
+import { useConnection } from '../contexts/ConnectionContext';
+import { ProductService } from '../services/ProductService';
+
+import FilterProductListScreen from './FilterProductListScreen';
+import EditProductScreen from './EditProductScreen';
+
 
 const ProductListScreen = () => {
-  const { products, fetchProducts, updateProducts } = useProducts();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const navigation = useNavigation();
   const [selectedProduct, setSelectedProduct] = useState<IProduct>({} as IProduct);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [isScannerVisible, setScannerVisible] = useState(false);
 
+  const { products, fetchProducts, updateProducts } = useProducts();
+  const { isConnected } = useConnection();
+  const navigation = useNavigation();
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadProducts();
+    }, [])
+  );
+
+  useLayoutEffect(() => {
+    (async () => {
+      checkPermissions();
+    })();
+  }, []);
+
+  const checkPermissions = async () => {
+    const { status } = await Camera.requestCameraPermissionsAsync();
+    setHasPermission(status === 'granted');
+  };
+
   const loadProducts = async () => {
     setError(null);
     setLoading(true);
-    const isOnline = await checkConnection();
-    if (isOnline) {
+    if (isConnected) {
       try {
         await fetchProducts();
       } catch (error) {
@@ -63,11 +108,7 @@ const ProductListScreen = () => {
     }
   };
 
-  useFocusEffect(
-    React.useCallback(() => {
-      loadProducts();
-    }, [])
-  );
+  
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -104,12 +145,7 @@ const ProductListScreen = () => {
     setIsEditModalVisible(true);
   };
 
-  useLayoutEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
-  }, []);
+  
 
   const handleBarCodeScanned = ({ type, data }: any) => {
     setScannerVisible(false);

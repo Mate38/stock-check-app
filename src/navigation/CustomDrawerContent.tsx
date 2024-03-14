@@ -1,6 +1,7 @@
 import React from 'react';
-import { Alert } from 'react-native';
 import { DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
+import { Alert } from 'react-native';
+
 import { logoutUser } from '../services/AuthService';
 
 const CustomDrawerContent = (props: any) => {

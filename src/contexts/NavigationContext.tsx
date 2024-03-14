@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 
+
 interface NavigationContextType {
     navigationReady: boolean;
     setNavigationReady: (ready: boolean) => void;

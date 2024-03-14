@@ -1,40 +1,55 @@
 import React, { useState } from 'react';
-import { ActivityIndicator } from 'react-native';
-import { CompanyService } from '../services/CompanyService';
-import { ICompanyData } from '../types/CompanyDataTypes';
-import { Container, InfoSection, TitleInfo, ContentInfo, LoadingContainer, ErrorContainer, ErrorText } from '../styles/DataShowStyles';
-import { checkConnection } from '../services/ConnectionService';
 import { useFocusEffect } from '@react-navigation/native';
 
-const CompanyDataScreen = () => {
-  const [companyData, setCompanyData] = useState<ICompanyData | null>(null);
+import { 
+  ActivityIndicator 
+} from 'react-native';
+import { 
+  Container, 
+  InfoSection, 
+  TitleInfo, 
+  ContentInfo, 
+  LoadingContainer, 
+  ErrorContainer, 
+  ErrorText 
+} from '../styles/DataShowStyles';
+
+import { ICompany } from '../types/CompanyTypes';
+
+import { useConnection } from '../contexts/ConnectionContext';
+import { CompanyService } from '../services/CompanyService';
+
+
+const CompanyScreen = () => {
+  const [company, setCompany] = useState<ICompany | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadCompanyData = async () => {
+  const { isConnected } = useConnection();
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadCompany();
+    }, [])
+  );
+
+  const loadCompany = async () => {
     setError(null);
     setLoading(true);
     try {
-      const isOnline = await checkConnection();
       let data;
-      if (isOnline) {
-        data = await CompanyService.fetchCompanyData();
+      if (isConnected) {
+        data = await CompanyService.fetchCompany();
       } else {
-        data = await CompanyService.getCompanyData();
+        data = await CompanyService.getLocalCompany();
       }
-      setCompanyData(data);
+      setCompany(data);
     } catch (error) {
       setError('Erro ao carregar os dados da empresa');
     } finally {
       setLoading(false);
     }
   };
-
-  useFocusEffect(
-    React.useCallback(() => {
-      loadCompanyData();
-    }, [])
-  );
 
   const formatCNPJ = (cnpj: string): string => {
     const numericCNPJ = cnpj.replace(/\D/g, '');
@@ -71,16 +86,16 @@ const CompanyDataScreen = () => {
     <Container>
       <InfoSection>
         <TitleInfo>Nome:</TitleInfo>
-        <ContentInfo>{companyData?.name}</ContentInfo>
+        <ContentInfo>{company?.name}</ContentInfo>
         <TitleInfo>CNPJ:</TitleInfo>
-        <ContentInfo>{companyData?.identification ? formatCNPJ(companyData?.identification) : ''}</ContentInfo>
+        <ContentInfo>{company?.identification ? formatCNPJ(company?.identification) : ''}</ContentInfo>
         <TitleInfo>Endereço:</TitleInfo>
-        <ContentInfo>{`${companyData?.addressCollection[0]?.street}, ${companyData?.addressCollection[0]?.number}, ${companyData?.addressCollection[0]?.neighbourhood}, ${companyData?.addressCollection[0]?.zipCode.city.name} - ${companyData?.addressCollection[0]?.zipCode.city.state.acronym}`}</ContentInfo>
+        <ContentInfo>{`${company?.addressCollection[0]?.street}, ${company?.addressCollection[0]?.number}, ${company?.addressCollection[0]?.neighbourhood}, ${company?.addressCollection[0]?.zipCode.city.name} - ${company?.addressCollection[0]?.zipCode.city.state.acronym}`}</ContentInfo>
         <TitleInfo>Telefone:</TitleInfo>
-        <ContentInfo>{companyData?.phoneCollection[0]?.number ? formatPhone(companyData?.phoneCollection[0]?.areaCode + companyData?.phoneCollection[0]?.number) : ''}</ContentInfo>
+        <ContentInfo>{company?.phoneCollection[0]?.number ? formatPhone(company?.phoneCollection[0]?.areaCode + company?.phoneCollection[0]?.number) : ''}</ContentInfo>
       </InfoSection>
     </Container>
   );
 };
 
-export default CompanyDataScreen;
+export default CompanyScreen;

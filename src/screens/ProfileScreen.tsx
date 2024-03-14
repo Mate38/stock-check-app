@@ -1,26 +1,42 @@
 import React, { useState } from 'react';
-import { ActivityIndicator } from 'react-native';
-import { ProfileService } from '../services/ProfileService';
-import { IProfileData } from '../types/ProfileTypes';
-import { Container, InfoSection, TitleInfo, ContentInfo, LoadingContainer, ErrorContainer, ErrorText } from '../styles/DataShowStyles';
-import { checkConnection } from '../services/ConnectionService';
 import { useFocusEffect } from '@react-navigation/native';
+
+import { 
+  ActivityIndicator 
+} from 'react-native';
+
+import { 
+  Container, 
+  InfoSection, 
+  TitleInfo, 
+  ContentInfo, 
+  LoadingContainer, 
+  ErrorContainer, 
+  ErrorText 
+} from '../styles/DataShowStyles';
+
+import { IProfileData } from '../types/ProfileTypes';
+
+import { useConnection } from '../contexts/ConnectionContext';
+import { ProfileService } from '../services/ProfileService';
+
 
 const ProfileScreen = () => {
   const [profile, setProfile] = useState<IProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const { isConnected } = useConnection();
+
   const loadProfileData = async () => {
     setError(null);
     setLoading(true);
     try {
-      const isOnline = await checkConnection();
       let profileData;
-      if (isOnline) {
+      if (isConnected) {
         profileData = await ProfileService.fetchUserProfile();
       } else {
-        profileData = await ProfileService.getProfile();
+        profileData = await ProfileService.getLocalProfile();
       }
       setProfile(profileData);
     } catch (error) {

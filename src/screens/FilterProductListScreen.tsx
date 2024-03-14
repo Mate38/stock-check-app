@@ -1,6 +1,17 @@
 import React, { useState } from 'react';
-import { Label, ButtonContainer, ButtonText } from '../styles/CommonStyles';
-import { FilterContainer, StyledInput, ButtonWrapper, FormContainer } from '../styles/FilterProductListStyles';
+
+import { 
+  Label, 
+  ButtonContainer, 
+  ButtonText 
+} from '../styles/CommonStyles';
+import { 
+  FilterContainer, 
+  StyledInput, 
+  ButtonWrapper, 
+  FormContainer 
+} from '../styles/FilterProductListStyles';
+
 
 interface FilterProductListScreenProps {
   onClose: () => void;

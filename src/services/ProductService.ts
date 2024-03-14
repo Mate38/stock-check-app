@@ -1,6 +1,8 @@
 import apiClient from '../api/apiClient';
+
 import { IProduct } from '../types/ProductTypes';
 import { DatabaseService } from './DatabaseService';
+
 
 const GET_PRODUCTS_ENDPOINT = '/rpc/v1/inventory.get-product';
 const UPDATE_PRODUCT_ENDPOINT = '/rpc/v1/inventory.put-product';

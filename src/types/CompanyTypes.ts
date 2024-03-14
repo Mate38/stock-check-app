@@ -1,4 +1,4 @@
-export interface ICompanyData {
+export interface ICompany {
     uuid: string;
     identification: string;
     name: string;

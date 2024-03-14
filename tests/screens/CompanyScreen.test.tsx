@@ -1,12 +1,12 @@
 import React from 'react';
 import { render, waitFor } from '@testing-library/react-native';
-import CompanyDataScreen from '../../src/screens/CompanyDataScreen';
+import CompanyScreen from '../../src/screens/CompanyScreen';
 import { CompanyService } from '../../src/services/CompanyService';
-import { ICompanyData } from '../../src/types/CompanyDataTypes';
+import { ICompany } from '../../src/types/CompanyTypes';
 
 jest.mock('../../src/services/CompanyService');
 
-const mockCompanyData: ICompanyData = {
+const mockCompany: ICompany = {
   uuid: 'uuid-test',
   identification: '00.000.000/0001-00',
   name: 'Test Company',
@@ -31,30 +31,30 @@ const mockCompanyData: ICompanyData = {
   }]
 };
 
-describe('CompanyDataScreen', () => {
+describe('CompanyScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it('displays loading indicator while fetching company data', async () => {
-    (CompanyService.fetchCompanyData as jest.Mock).mockReturnValue(new Promise(() => {}));
-    const { getByTestId } = render(<CompanyDataScreen />);
+    (CompanyService.fetchCompany as jest.Mock).mockReturnValue(new Promise(() => {}));
+    const { getByTestId } = render(<CompanyScreen />);
     expect(getByTestId('loading-indicator')).toBeTruthy();
   });
 
   it('displays company data once fetched', async () => {
-    (CompanyService.fetchCompanyData as jest.Mock).mockResolvedValue(mockCompanyData);
-    const { getByText } = render(<CompanyDataScreen />);
+    (CompanyService.fetchCompany as jest.Mock).mockResolvedValue(mockCompany);
+    const { getByText } = render(<CompanyScreen />);
 
     await waitFor(() => {
-      expect(getByText(mockCompanyData.name)).toBeTruthy();
-      expect(getByText(mockCompanyData.identification)).toBeTruthy();
+      expect(getByText(mockCompany.name)).toBeTruthy();
+      expect(getByText(mockCompany.identification)).toBeTruthy();
     });
   });
 
   it('displays an error message if there is an error fetching company data', async () => {
-    (CompanyService.fetchCompanyData as jest.Mock).mockRejectedValue(new Error('Error fetching company data'));
-    const { getByTestId } = render(<CompanyDataScreen />);
+    (CompanyService.fetchCompany as jest.Mock).mockRejectedValue(new Error('Error fetching company data'));
+    const { getByTestId } = render(<CompanyScreen />);
 
     await waitFor(() => {
       expect(getByTestId('error-text')).toBeTruthy();

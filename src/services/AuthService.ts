@@ -1,14 +1,18 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import apiClient from '../api/apiClient';
+
 import { storeToken } from '../utils/storage';
 import { IAuthResponse, IAuthError } from '../types/AuthTypes';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DatabaseService } from './DatabaseService';
 
-const ENDPOINT = '/rpc/v2/application.authenticate';
+
+const AUTHENTICATE_ENDPOINT = '/rpc/v2/application.authenticate';
+
+const USER_AUTH_JSON_ID = 'userAuth';
 
 export const authenticate = async (login: string, password: string): Promise<boolean> => {
   try {
-    const response = await apiClient.post<IAuthResponse>(ENDPOINT, {
+    const response = await apiClient.post<IAuthResponse>(AUTHENTICATE_ENDPOINT, {
       login,
       password,
       isModulizedAccess: true
@@ -16,7 +20,7 @@ export const authenticate = async (login: string, password: string): Promise<boo
 
     const { access_token: accessToken, auth_status: authStatus } = response.data;
 
-    DatabaseService.storeJson('userAuth', response.data);
+    DatabaseService.storeJson(USER_AUTH_JSON_ID, response.data);
 
     if (authStatus === 200 && accessToken) {
       await storeToken(accessToken);
@@ -33,6 +37,6 @@ export const authenticate = async (login: string, password: string): Promise<boo
 
 export const logoutUser = async (navigation: any) => {
   await AsyncStorage.clear();
-  await DatabaseService.removeJson('userAuth');
+  await DatabaseService.removeJson(USER_AUTH_JSON_ID);
   navigation.navigate('Login');
 };

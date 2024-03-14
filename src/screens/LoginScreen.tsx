@@ -1,12 +1,25 @@
 import React, { useState } from 'react';
-import { Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+
+import { 
+  Alert 
+} from 'react-native';
+
+import { 
+  Container, 
+  Input, 
+  ButtonContainer, 
+  ButtonText, 
+  Title 
+} from '../styles/LoginStyles';
+
 import { authenticate } from '../services/AuthService';
-import { Container, Input, ButtonContainer, ButtonText, Title } from '../styles/LoginStyles';
+
 
 const LoginScreen = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+
   const navigation: any = useNavigation();
 
   const validateEmail = (email: string) => {
