@@ -1,5 +1,5 @@
 import React, { useState, useLayoutEffect } from 'react';
-import { FlatList, ActivityIndicator, Modal, TouchableOpacity } from 'react-native';
+import { FlatList, ActivityIndicator, Modal, TouchableOpacity, View, Text, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { LoadingContainer, ErrorContainer, ErrorText } from '../styles/DataShowStyles';
 import { ProductItemContainer, ProductRow, ProductDescription, ProductDetails, ProductPrice, ProductDetailLabel, ProductDetailGroup, ScreenContainer, ButtonsRow } from '../styles/ProductStyles';
@@ -11,6 +11,7 @@ import { ProductService } from '../services/ProductService';
 import { useFocusEffect } from '@react-navigation/native';
 import EditProductScreen from './EditProductScreen';
 import { IProduct } from '../types/ProductTypes';
+import { Camera } from 'expo-camera';
 
 const ProductListScreen = () => {
   const { products, fetchProducts, updateProducts } = useProducts();
@@ -20,6 +21,8 @@ const ProductListScreen = () => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const navigation = useNavigation();
   const [selectedProduct, setSelectedProduct] = useState<IProduct>({} as IProduct);
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [isScannerVisible, setScannerVisible] = useState(false);
 
   const loadProducts = async () => {
     setError(null);
@@ -70,27 +73,57 @@ const ProductListScreen = () => {
     navigation.setOptions({
       headerRight: () => (
         <ButtonsRow>
-          <AntDesign
-            name="reload1"
-            size={26}
-            onPress={loadProducts}
-            style={{ marginRight: 20 }}
-          />
-          <AntDesign
-            name="filter"
-            size={26}
-            onPress={() => setIsFilterModalVisible(true)}
-            style={{ marginRight: 15 }}
-          />
+          <TouchableOpacity onPress={() => loadProducts()}>
+            <AntDesign
+              name="reload1"
+              size={26}
+              style={{ marginRight: 20 }}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setScannerVisible(true)}>
+            <AntDesign
+              name="barcode"
+              size={27}
+              style={{ marginRight: 20 }}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setIsFilterModalVisible(true)}>
+            <AntDesign
+              name="filter"
+              size={26}
+              style={{ marginRight: 15 }}
+            />
+          </TouchableOpacity>
         </ButtonsRow>
       ),
     });
-  }, [navigation]);
+  }, [navigation, loadProducts]);
 
   const openEditModal = (product: any) => {
     setSelectedProduct(product);
     setIsEditModalVisible(true);
   };
+
+  useLayoutEffect(() => {
+    (async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      setHasPermission(status === 'granted');
+    })();
+  }, []);
+
+  const handleBarCodeScanned = ({ type, data }: any) => {
+    setScannerVisible(false);
+    data = '7896045506590';
+    filterProducts('', data);
+  };
+
+  if (hasPermission === null) {
+    return <View />;
+  }
+
+  if (hasPermission === false) {
+    return <Text>Sem acesso a câmera</Text>;
+  }
 
   if (loading) {
     return (
@@ -155,6 +188,17 @@ const ProductListScreen = () => {
         onRequestClose={() => setIsEditModalVisible(false)}
       >
         <EditProductScreen product={selectedProduct} onClose={() => setIsEditModalVisible(false)} />
+      </Modal>
+      <Modal
+        visible={isScannerVisible}
+        onRequestClose={() => setScannerVisible(false)}>
+        <Camera
+          style={{ flex: 1 }}
+          onBarCodeScanned={isScannerVisible ? handleBarCodeScanned : undefined}>
+          <View style={{ flex: 1 }}>
+            <Button title="Fechar" onPress={() => setScannerVisible(false)} />
+          </View>
+        </Camera>
       </Modal>
     </ScreenContainer>
   );
