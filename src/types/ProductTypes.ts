@@ -7,6 +7,9 @@ export interface IProduct {
     quantity: number;
     barCode: string;
     unit: string;
+    originalPrice?: number;
+    originalQuantity?: number;
+    hasLocalUpdate?: boolean;
     unitOfMeasure: IUnitOfMeasure;
 }
 

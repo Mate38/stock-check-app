@@ -55,8 +55,29 @@ export const ConnectionProvider = ({ children }: { children: React.ReactNode }) 
           try {
             const updatedProduct = await loadProductData(localProduct);
             if (updatedProduct) {
-              updatedProduct.price = localProduct.price;
-              updatedProduct.quantity = localProduct.quantity;
+
+              /**
+               * Como a política exata de tratamento de diferença para casos de alteração de preços não está documentada
+               * e o objeto do produto não traz data de alteração do preço para poder checar qual das duas alterações foram realizadas por ultimo
+               * decidi utilizar uma política de que caso o preço retornado esteja divergente do preço inicial que tinha antes de ser alterado mantém o preço do servidor
+               * TODO: Notificar o usuário do APP que a alteração do preço não foi concluída pois já haviam alterações posteriores no servidor
+               */
+              if(updatedProduct.price === localProduct.originalPrice) {
+                updatedProduct.price = localProduct.price;
+              }
+
+              /**
+               * Já com a quantidade decidi por no caso de haver alterações somar essa alteração com a alteração realizada no app
+               */
+              if(updatedProduct.quantity === localProduct.originalQuantity) {
+                updatedProduct.quantity = localProduct.quantity;
+              } else {
+                if(localProduct.originalQuantity) {
+                  let dif = Math.abs(localProduct.originalQuantity - localProduct.quantity);
+                  updatedProduct.quantity = updatedProduct.quantity + dif;
+                }
+              }
+
               await ProductService.updateProduct(updatedProduct);
             }
           } catch (error) {
