@@ -3,8 +3,10 @@ import { render, waitFor } from '@testing-library/react-native';
 import ProfileScreen from '../../src/screens/ProfileScreen';
 import { ProfileService } from '../../src/services/ProfileService';
 import { IProfileData } from '../../src/types/ProfileTypes';
+import * as ConnectionContext from '../../src/contexts/ConnectionContext';
 
 jest.mock('../../src/services/ProfileService');
+jest.mock('../../src/contexts/ConnectionContext');
 
 const mockProfileData: IProfileData = {
   name: 'John Doe',
@@ -14,6 +16,8 @@ const mockProfileData: IProfileData = {
 describe('ProfileScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    const mockUseConnection = jest.fn().mockReturnValue({ isConnected: true });
+    (ConnectionContext.useConnection as jest.Mock) = mockUseConnection;
   });
 
   it('displays loading indicator while fetching profile data', async () => {

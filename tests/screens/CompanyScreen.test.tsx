@@ -3,8 +3,10 @@ import { render, waitFor } from '@testing-library/react-native';
 import CompanyScreen from '../../src/screens/CompanyScreen';
 import { CompanyService } from '../../src/services/CompanyService';
 import { ICompany } from '../../src/types/CompanyTypes';
+import * as ConnectionContext from '../../src/contexts/ConnectionContext';
 
 jest.mock('../../src/services/CompanyService');
+jest.mock('../../src/contexts/ConnectionContext');
 
 const mockCompany: ICompany = {
   uuid: 'uuid-test',
@@ -34,6 +36,8 @@ const mockCompany: ICompany = {
 describe('CompanyScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    const mockUseConnection = jest.fn().mockReturnValue({ isConnected: true });
+    (ConnectionContext.useConnection as jest.Mock) = mockUseConnection;
   });
 
   it('displays loading indicator while fetching company data', async () => {
