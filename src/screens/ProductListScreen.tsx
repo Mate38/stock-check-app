@@ -55,22 +55,6 @@ const ProductListScreen = () => {
   const { isConnected } = useConnection();
   const navigation = useNavigation();
 
-  useFocusEffect(
-    React.useCallback(() => {
-      loadProducts();
-    }, [])
-  );
-
-  useLayoutEffect(() => {
-    (async () => {
-      checkPermissions();
-    })();
-  }, []);
-
-  const checkPermissions = async () => {
-    const { status } = await Camera.requestCameraPermissionsAsync();
-    setHasPermission(status === 'granted');
-  };
 
   const loadProducts = async () => {
     setError(null);
@@ -94,6 +78,23 @@ const ProductListScreen = () => {
     }
     setLoading(false);
   };
+  
+  useFocusEffect(
+    React.useCallback(() => {
+      loadProducts();
+    }, [])
+  );
+
+  const checkPermissions = async () => {
+    const { status } = await Camera.requestCameraPermissionsAsync();
+    setHasPermission(status === 'granted');
+  };
+
+  useLayoutEffect(() => {
+    (async () => {
+      checkPermissions();
+    })();
+  }, []);
 
   const handleFilter = (description: string, barCode: string) => {
     setIsFiltering(true);

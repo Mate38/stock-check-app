@@ -27,12 +27,6 @@ const CompanyScreen = () => {
 
   const { isConnected } = useConnection();
 
-  useFocusEffect(
-    React.useCallback(() => {
-      loadCompany();
-    }, [])
-  );
-
   const loadCompany = async () => {
     setError(null);
     setLoading(true);
@@ -50,6 +44,12 @@ const CompanyScreen = () => {
       setLoading(false);
     }
   };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadCompany();
+    }, [isConnected])
+  );
 
   const formatCNPJ = (cnpj: string): string => {
     const numericCNPJ = cnpj.replace(/\D/g, '');

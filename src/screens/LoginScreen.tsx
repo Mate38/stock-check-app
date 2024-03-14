@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 
-import { 
-  Alert 
-} from 'react-native';
+import { Alert } from 'react-native';
 
 import { 
   Container, 

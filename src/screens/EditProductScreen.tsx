@@ -42,11 +42,7 @@ const EditProductScreen: React.FC<EditProductScreenProps> = ({ product, onClose 
   const { updateProduct, setHasLocalUpdate } = useProducts();
   const { isConnected } = useConnection();
   
-  useEffect(() => {
-    loadProductData();
-  }, []);
-
-  const loadProductData = async () => {
+  const loadProduct = async () => {
     setLoading(true);
     if (isConnected) {
       try {
@@ -71,6 +67,10 @@ const EditProductScreen: React.FC<EditProductScreenProps> = ({ product, onClose 
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    loadProduct();
+  }, []);
 
   const handleSave = async () => {
     if (isConnected) {
