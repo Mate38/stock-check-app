@@ -7,6 +7,8 @@ interface ProductContextType {
     fetchProducts: () => Promise<void>;
     updateProducts: (newProducts: IProduct[]) => void;
     updateProduct: (updatedProduct: IProduct) => void;
+    hasLocalUpdate: boolean;
+    setHasLocalUpdate: (hasUpdate: boolean) => void;
 }
 
 const ProductContext = createContext<ProductContextType>({} as ProductContextType);
@@ -17,6 +19,7 @@ interface ProductProviderProps {
 
 export const ProductProvider = ({ children }: ProductProviderProps) => {
     const [products, setProducts] = useState<IProduct[]>([]);
+    const [hasLocalUpdate, setHasLocalUpdate] = useState<boolean>(false);
 
     const fetchProducts = useCallback(async () => {
         try {
@@ -45,7 +48,7 @@ export const ProductProvider = ({ children }: ProductProviderProps) => {
     }, [products]);
 
     return (
-        <ProductContext.Provider value={{ products, fetchProducts, updateProducts, updateProduct }}>
+        <ProductContext.Provider value={{ products, fetchProducts, updateProducts, updateProduct, setHasLocalUpdate, hasLocalUpdate }}>
             {children}
         </ProductContext.Provider>
     );

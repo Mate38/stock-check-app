@@ -12,6 +12,7 @@ const CompanyDataScreen = () => {
   const [error, setError] = useState<string | null>(null);
 
   const loadCompanyData = async () => {
+    setError(null);
     setLoading(true);
     try {
       const isOnline = await checkConnection();

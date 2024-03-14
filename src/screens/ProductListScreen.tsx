@@ -22,6 +22,7 @@ const ProductListScreen = () => {
   const [selectedProduct, setSelectedProduct] = useState<IProduct>({} as IProduct);
 
   const loadProducts = async () => {
+    setError(null);
     setLoading(true);
     const isOnline = await checkConnection();
     if (isOnline) {

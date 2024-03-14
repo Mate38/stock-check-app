@@ -18,8 +18,8 @@ const EditProductScreen: React.FC<EditProductScreenProps> = ({ product, onClose 
   const [price, setPrice] = useState(product.price.toString());
   const [quantity, setQuantity] = useState(product.quantity.toString());
   const [loading, setLoading] = useState(true);
+  const { updateProduct, setHasLocalUpdate } = useProducts();
 
-  const { updateProduct } = useProducts();
 
   useEffect(() => {
     const loadProductData = async () => {
@@ -59,23 +59,30 @@ const EditProductScreen: React.FC<EditProductScreenProps> = ({ product, onClose 
         const updatedProduct = { ...currentProduct, price: parseFloat(price), quantity: parseFloat(quantity) };
         await ProductService.updateProduct(updatedProduct);
         updateProduct(updatedProduct);
-        Alert.alert(
-          'Sucesso',
-          'Produto atualizado com sucesso!',
-          [
-            {
-              text: 'OK',
-              onPress: () => onClose()
-            }
-          ]);
-
       } catch (error) {
         Alert.alert('Erro', 'Não foi possível atualizar o produto.');
       }
     } else {
-      const updatedProduct = { ...currentProduct, originalPrice: currentProduct.price, originalQuantity: currentProduct.quantity, price: parseFloat(price), quantity: parseFloat(quantity) };
+      const updatedProduct = { 
+        ...currentProduct,
+        hasLocalUpdate: true,
+        originalPrice: currentProduct.price, 
+        originalQuantity: currentProduct.quantity, 
+        price: parseFloat(price), 
+        quantity: parseFloat(quantity) 
+      };
       updateProduct(updatedProduct);
+      setHasLocalUpdate(true);
     }
+    Alert.alert(
+      'Sucesso',
+      'Produto atualizado com sucesso!',
+      [
+        {
+          text: 'OK',
+          onPress: () => onClose()
+        }
+      ]);
   };
 
   if (loading) {

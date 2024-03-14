@@ -8,11 +8,11 @@ const ConnectionStatusScreen = () => {
 
   useFocusEffect(
     React.useCallback(() => {
-      const subscription: any = NetInfo.addEventListener(state => {
+      const unsubscribe : any = NetInfo.addEventListener(state => {
         setIsOnline(state.isConnected && state.isInternetReachable);
       });
 
-      // return () => subscription.remove();
+      return () => unsubscribe();
     }, [])
   );
 

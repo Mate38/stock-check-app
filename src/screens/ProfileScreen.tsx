@@ -12,6 +12,7 @@ const ProfileScreen = () => {
   const [error, setError] = useState<string | null>(null);
 
   const loadProfileData = async () => {
+    setError(null);
     setLoading(true);
     try {
       const isOnline = await checkConnection();
