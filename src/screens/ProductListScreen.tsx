@@ -48,6 +48,8 @@ const ProductListScreen = () => {
   const [selectedProduct, setSelectedProduct] = useState<IProduct>({} as IProduct);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [isScannerVisible, setScannerVisible] = useState(false);
+  const [filteredProducts, setFilteredProducts] = useState<IProduct[]>([]);
+  const [isFiltering, setIsFiltering] = useState(false);
 
   const { products, fetchProducts, updateProducts } = useProducts();
   const { isConnected } = useConnection();
@@ -83,13 +85,22 @@ const ProductListScreen = () => {
       try {
         const localProducts = await ProductService.getLocalProducts();
         if (localProducts) {
-          updateProducts(localProducts);
+          setFilteredProducts(localProducts);
+          setIsFiltering(false);
         }
       } catch (error) {
         setError('Erro ao buscar os produtos localmente');
       }
     }
     setLoading(false);
+  };
+
+  const handleFilter = (description: string, barCode: string) => {
+    setIsFiltering(true);
+    const result = products.filter(product =>
+      product.description.includes(description) && product.barCode.includes(barCode)
+    );
+    setFilteredProducts(result);
   };
 
   const filterProducts = (description: string, barCode: string) => {
@@ -107,8 +118,6 @@ const ProductListScreen = () => {
       setLoading(false);
     }
   };
-
-  
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -140,16 +149,18 @@ const ProductListScreen = () => {
     });
   }, [navigation, loadProducts]);
 
-  const openEditModal = (product: any) => {
+  const openEditModal = (product: IProduct) => {
     setSelectedProduct(product);
     setIsEditModalVisible(true);
   };
 
-  
+  const closeEditModal = () => {
+    loadProducts()
+    setIsEditModalVisible(false);
+  }
 
-  const handleBarCodeScanned = ({ type, data }: any) => {
+  const handleBarCodeScanned = ({ type, data }: { type: string; data: string }) => {
     setScannerVisible(false);
-    data = '7896045506590';
     filterProducts('', data);
   };
 
@@ -177,10 +188,12 @@ const ProductListScreen = () => {
     );
   }
 
+  const displayProducts = isFiltering ? filteredProducts : products;
+
   return (
     <ScreenContainer>
       <FlatList
-        data={products}
+        data={displayProducts}
         keyExtractor={item => item.uuid}
         renderItem={({ item }) => (
           <TouchableOpacity onPress={() => openEditModal(item)}>
@@ -215,15 +228,15 @@ const ProductListScreen = () => {
         visible={isFilterModalVisible}
         onRequestClose={() => setIsFilterModalVisible(false)}
       >
-        <FilterProductListScreen onClose={() => setIsFilterModalVisible(false)} filterProducts={filterProducts} />
+        <FilterProductListScreen onClose={() => setIsFilterModalVisible(false)} filterProducts={handleFilter} />
       </Modal>
       <Modal
         animationType="slide"
         transparent={true}
         visible={isEditModalVisible}
-        onRequestClose={() => setIsEditModalVisible(false)}
+        onRequestClose={() => closeEditModal()}
       >
-        <EditProductScreen product={selectedProduct} onClose={() => setIsEditModalVisible(false)} />
+        <EditProductScreen product={selectedProduct} onClose={() => closeEditModal()} />
       </Modal>
       <Modal
         visible={isScannerVisible}
