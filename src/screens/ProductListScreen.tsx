@@ -1,5 +1,5 @@
 import React, { useState, useLayoutEffect } from 'react';
-import { FlatList, ActivityIndicator, Modal } from 'react-native';
+import { FlatList, ActivityIndicator, Modal, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { LoadingContainer, ErrorContainer, ErrorText } from '../styles/DataShowStyles';
 import { ProductItemContainer, ProductRow, ProductDescription, ProductDetails, ProductPrice, ProductDetailLabel, ProductDetailGroup, ScreenContainer, ButtonsRow } from '../styles/ProductStyles';
@@ -9,32 +9,36 @@ import { useProducts } from '../contexts/ProductContext';
 import { checkConnection } from '../services/ConnectionService';
 import { ProductService } from '../services/ProductService';
 import { useFocusEffect } from '@react-navigation/native';
+import EditProductScreen from './EditProductScreen';
+import { IProduct } from '../types/ProductTypes';
 
 const ProductListScreen = () => {
   const { products, fetchProducts, updateProducts } = useProducts();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const navigation = useNavigation();
+  const [selectedProduct, setSelectedProduct] = useState<IProduct>({} as IProduct);
 
   const loadProducts = async () => {
     setLoading(true);
     const isOnline = await checkConnection();
     if (isOnline) {
-        try {
-            await fetchProducts();
-        } catch (error) {
-            setError('Erro ao buscar os produtos');
-        }
+      try {
+        await fetchProducts();
+      } catch (error) {
+        setError('Erro ao buscar os produtos');
+      }
     } else {
-        try {
-            const localProducts = await ProductService.getLocalProducts();
-            if (localProducts) {
-              updateProducts(localProducts);
-            }
-        } catch (error) {
-            setError('Erro ao buscar os produtos localmente');
+      try {
+        const localProducts = await ProductService.getLocalProducts();
+        if (localProducts) {
+          updateProducts(localProducts);
         }
+      } catch (error) {
+        setError('Erro ao buscar os produtos localmente');
+      }
     }
     setLoading(false);
   };
@@ -65,10 +69,10 @@ const ProductListScreen = () => {
     navigation.setOptions({
       headerRight: () => (
         <ButtonsRow>
-          <AntDesign 
-            name="reload1" 
-            size={26} 
-            onPress={loadProducts} 
+          <AntDesign
+            name="reload1"
+            size={26}
+            onPress={loadProducts}
             style={{ marginRight: 20 }}
           />
           <AntDesign
@@ -81,6 +85,11 @@ const ProductListScreen = () => {
       ),
     });
   }, [navigation]);
+
+  const openEditModal = (product: any) => {
+    setSelectedProduct(product);
+    setIsEditModalVisible(true);
+  };
 
   if (loading) {
     return (
@@ -104,28 +113,30 @@ const ProductListScreen = () => {
         data={products}
         keyExtractor={item => item.uuid}
         renderItem={({ item }) => (
-          <ProductItemContainer>
-            <ProductRow>
-              <ProductDescription>{item.description}</ProductDescription>
-              <ProductPrice>R$ {item.price.toFixed(2)}</ProductPrice>
-            </ProductRow>
-            <ProductRow>
-              <ProductDetailGroup>
-                <ProductDetailLabel>Cód.:</ProductDetailLabel>
-                <ProductDetails>{item.sequence}</ProductDetails>
-              </ProductDetailGroup>
-              <ProductDetailGroup>
-                <ProductDetailLabel>Qtd.:</ProductDetailLabel>
-                <ProductDetails>{item.quantity}</ProductDetails>
-              </ProductDetailGroup>
-            </ProductRow>
-            <ProductRow>
-              <ProductDetailGroup>
-                <ProductDetailLabel>Cód. barras:</ProductDetailLabel>
-                <ProductDetails>{item.barCode}</ProductDetails>
-              </ProductDetailGroup>
-            </ProductRow>
-          </ProductItemContainer>
+          <TouchableOpacity onPress={() => openEditModal(item)}>
+            <ProductItemContainer>
+              <ProductRow>
+                <ProductDescription>{item.description}</ProductDescription>
+                <ProductPrice>R$ {item.price.toFixed(2)}</ProductPrice>
+              </ProductRow>
+              <ProductRow>
+                <ProductDetailGroup>
+                  <ProductDetailLabel>Cód.:</ProductDetailLabel>
+                  <ProductDetails>{item.sequence}</ProductDetails>
+                </ProductDetailGroup>
+                <ProductDetailGroup>
+                  <ProductDetailLabel>Qtd.:</ProductDetailLabel>
+                  <ProductDetails>{item.quantity} {item.unitOfMeasure.acronym}</ProductDetails>
+                </ProductDetailGroup>
+              </ProductRow>
+              <ProductRow>
+                <ProductDetailGroup>
+                  <ProductDetailLabel>Cód. barras:</ProductDetailLabel>
+                  <ProductDetails>{item.barCode}</ProductDetails>
+                </ProductDetailGroup>
+              </ProductRow>
+            </ProductItemContainer>
+          </TouchableOpacity>
         )}
       />
       <Modal
@@ -135,6 +146,14 @@ const ProductListScreen = () => {
         onRequestClose={() => setIsFilterModalVisible(false)}
       >
         <FilterProductListScreen onClose={() => setIsFilterModalVisible(false)} filterProducts={filterProducts} />
+      </Modal>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isEditModalVisible}
+        onRequestClose={() => setIsEditModalVisible(false)}
+      >
+        <EditProductScreen product={selectedProduct} onClose={() => setIsEditModalVisible(false)} />
       </Modal>
     </ScreenContainer>
   );

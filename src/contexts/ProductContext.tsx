@@ -6,6 +6,7 @@ interface ProductContextType {
     products: IProduct[];
     fetchProducts: () => Promise<void>;
     updateProducts: (newProducts: IProduct[]) => void;
+    updateProduct: (updatedProduct: IProduct) => void;
 }
 
 const ProductContext = createContext<ProductContextType>({} as ProductContextType);
@@ -21,6 +22,7 @@ export const ProductProvider = ({ children }: ProductProviderProps) => {
         try {
             const fetchedProducts = await ProductService.getProducts();
             setProducts(fetchedProducts);
+            ProductService.storeLocalProducts(fetchedProducts);
         } catch (error) {
             console.error('Erro ao buscar os produtos', error);
         }
@@ -28,10 +30,22 @@ export const ProductProvider = ({ children }: ProductProviderProps) => {
 
     const updateProducts = useCallback((newProducts: IProduct[]) => {
         setProducts(newProducts);
+        ProductService.storeLocalProducts(newProducts);
     }, []);
 
+    const updateProduct = useCallback((updatedProduct: IProduct) => {
+        const newProducts: IProduct[] = products.map(product => {
+            if (product.id === updatedProduct.id) {
+                return updatedProduct;
+            }
+            return product;
+        });
+        setProducts(newProducts);
+        ProductService.storeLocalProducts(newProducts);
+    }, [products]);
+
     return (
-        <ProductContext.Provider value={{ products, fetchProducts, updateProducts }}>
+        <ProductContext.Provider value={{ products, fetchProducts, updateProducts, updateProduct }}>
             {children}
         </ProductContext.Provider>
     );

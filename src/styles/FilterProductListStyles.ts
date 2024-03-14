@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { FormContainer as SharedFormContainer } from './CommonStyles';
 
 export const FilterContainer = styled.View`
   flex: 1;
@@ -11,6 +12,10 @@ export const FilterContainer = styled.View`
   shadow-color: #000;
   shadow-offset: 0px 2px;
   elevation: 2;
+`;
+
+export const FormContainer = styled(SharedFormContainer)`
+  margin-top: 5px;
 `;
 
 export const StyledInput = styled.TextInput`

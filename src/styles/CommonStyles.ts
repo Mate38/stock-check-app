@@ -7,6 +7,11 @@ export const Container = styled.View`
   background-color: #f7f7f7;
 `;
 
+export const FormContainer = styled.View`
+  flex: 1;
+  width: 100%;
+`;
+
 export const Title = styled.Text`
   font-size: 24px;
   font-weight: bold;
@@ -43,5 +48,11 @@ export const Label = styled.Text`
   color: #333;
   margin-bottom: 5px;
   font-weight: 600;
+`;
+
+export const Text = styled.Text`
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 5px;
 `;
 
