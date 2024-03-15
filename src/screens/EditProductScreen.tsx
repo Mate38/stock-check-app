@@ -89,13 +89,6 @@ const EditProductScreen: React.FC<EditProductScreenProps> = ({ product, onClose 
         quantity: parseFloat(quantity) 
       };
 
-      if(!currentProduct.originalPrice) {
-        updatedProduct.originalPrice = currentProduct.price;
-      }
-      if(!currentProduct.originalQuantity) {
-        updatedProduct.originalQuantity = currentProduct.quantity;
-      }
-
       updateProduct(updatedProduct);
       setHasLocalUpdate(true);
     }

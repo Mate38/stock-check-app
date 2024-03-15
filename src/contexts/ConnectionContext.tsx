@@ -15,23 +15,21 @@ const ConnectionContext = createContext({
 export const useConnection = () => useContext(ConnectionContext);
 
 export const ConnectionProvider = ({ children }: { children: React.ReactNode }) => {
-  const { products, hasLocalUpdate } = useProducts();
-
   const [isConnected, setIsConnected] = useState(false);
+  const [shouldSynchronize, setShouldSynchronize] = useState(false);
+
+  const { products, hasLocalUpdate, setHasLocalUpdate, fetchProducts } = useProducts();
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state: any) => {
       setIsConnected(state.isConnected && state.isInternetReachable);
+      if (state.isConnected && state.isInternetReachable) {
+        setShouldSynchronize(true);
+      }
     });
 
     return () => unsubscribe();
   }, []);
-
-  useEffect(() => {
-    if (isConnected) {
-      synchronizeData();
-    }
-  }, [isConnected, products]);
 
   const loadProductData = async (product: IProduct) => {
     try {
@@ -45,7 +43,6 @@ export const ConnectionProvider = ({ children }: { children: React.ReactNode }) 
       return null;
     }
   };
-
 
   const synchronizeData = async () => {
     if (hasLocalUpdate) {
@@ -62,23 +59,24 @@ export const ConnectionProvider = ({ children }: { children: React.ReactNode }) 
                * decidi utilizar uma política de que caso o preço retornado esteja divergente do preço inicial que tinha antes de ser alterado mantém o preço do servidor
                * TODO: Notificar o usuário do APP que a alteração do preço não foi concluída pois já haviam alterações posteriores no servidor
                */
-              if(updatedProduct.price === localProduct.originalPrice) {
+              if (updatedProduct.price === localProduct.originalPrice) {
                 updatedProduct.price = localProduct.price;
               }
 
               /**
                * Já com a quantidade decidi por no caso de haver alterações somar essa alteração com a alteração realizada no app
                */
-              if(updatedProduct.quantity === localProduct.originalQuantity) {
+              if (updatedProduct.quantity === localProduct.originalQuantity) {
                 updatedProduct.quantity = localProduct.quantity;
               } else {
-                if(localProduct.originalQuantity) {
+                if (localProduct.originalQuantity) {
                   let dif = Math.abs(localProduct.originalQuantity - localProduct.quantity);
                   updatedProduct.quantity = updatedProduct.quantity + dif;
                 }
               }
-
               await ProductService.updateProduct(updatedProduct);
+              updatedProduct.hasLocalUpdate = false;
+              setHasLocalUpdate(false);
             }
           } catch (error) {
             console.error('Falha ao sincronizar dados:', error);
@@ -86,7 +84,18 @@ export const ConnectionProvider = ({ children }: { children: React.ReactNode }) 
         }
       }
     }
+    if (products.length > 0) {
+      await fetchProducts();
+    }
   };
+
+  useEffect(() => {
+    if (isConnected && shouldSynchronize) {
+      synchronizeData().then(() => {
+        setShouldSynchronize(false);
+      });
+    }
+  }, [isConnected, shouldSynchronize, synchronizeData]);
 
   return (
     <ConnectionContext.Provider value={{ isConnected, synchronizeData }}>

@@ -25,7 +25,12 @@ export const ProductProvider = ({ children }: ProductProviderProps) => {
 
     const fetchProducts = useCallback(async () => {
         try {
-            const fetchedProducts = await ProductService.getProducts();
+            let fetchedProducts = await ProductService.getProducts();
+            fetchedProducts = fetchedProducts.map(product => ({
+                ...product,
+                originalPrice: product.price,
+                originalQuantity: product.quantity
+            }));
             setProducts(fetchedProducts);
             ProductService.storeLocalProducts(fetchedProducts);
         } catch (error) {
