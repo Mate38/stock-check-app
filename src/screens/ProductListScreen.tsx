@@ -61,6 +61,7 @@ const ProductListScreen = () => {
     setLoading(true);
     if (isConnected) {
       try {
+        setIsFiltering(false);
         await fetchProducts();
       } catch (error) {
         setError('Erro ao buscar os produtos');
